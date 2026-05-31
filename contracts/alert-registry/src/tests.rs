@@ -95,6 +95,27 @@ fn test_remove_alert() {
     assert!(client.get_alert(&id).is_none());
 }
 
+#[test]
+fn test_remove_alert_clears_from_owner_index() {
+    let (env, client) = setup();
+    let owner = Address::generate(&env);
+    let target = Address::generate(&env);
+
+    let id = client.register_alert(
+        &owner,
+        &target,
+        &str(&env, "Alert"),
+        &str(&env, "hash"),
+        &vec![&env],
+    );
+
+    assert_eq!(client.get_alerts_by_owner(&owner).len(), 1);
+
+    client.remove_alert(&owner, &id);
+
+    assert_eq!(client.get_alerts_by_owner(&owner).len(), 0);
+}
+
 // 4. Unauthorized update rejected
 #[test]
 fn test_update_unauthorized() {
